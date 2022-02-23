@@ -1,36 +1,41 @@
 "use strict";
-const BLACK = "B";
-const WHITE = "W";
-const DIRECTIONS = new Map([[WHITE, 1], [BLACK, -1]]);
-const PAWN_RANK = new Map([[WHITE, 1], [BLACK, 6]]);
-const OPPONENT = new Map([[WHITE, BLACK], [BLACK, WHITE]]);
-const KING = "K";
-const QUEEN = "Q";
-const KNIGHT = "N";
-const ROOK = "R";
-const BISHOP = "B";
-const PAWN = "P";
-const PAWN_PROMOTE_RANK = new Map([[WHITE, 7], [BLACK, 0]]);
-const VALUE = new Map([[QUEEN, 8], [BISHOP, 7], [KNIGHT, 6], [ROOK, 5], [PAWN, 4]]);
+var Pieces;
+(function (Pieces) {
+    Pieces[Pieces["King"] = 0] = "King";
+    Pieces[Pieces["Queen"] = 1] = "Queen";
+    Pieces[Pieces["Bishop"] = 2] = "Bishop";
+    Pieces[Pieces["Knight"] = 3] = "Knight";
+    Pieces[Pieces["Rook"] = 4] = "Rook";
+    Pieces[Pieces["Pawn"] = 5] = "Pawn";
+})(Pieces || (Pieces = {}));
+;
+const VALUE = new Map([[Pieces.Queen, 8], [Pieces.Bishop, 7],
+    [Pieces.Knight, 6], [Pieces.Rook, 5], [Pieces.Pawn, 4]]);
+var Color;
+(function (Color) {
+    Color[Color["Black"] = 0] = "Black";
+    Color[Color["White"] = 1] = "White";
+})(Color || (Color = {}));
+const PAWN_PROMOTE_RANK = new Map([[Color.White, 7], [Color.Black, 0]]);
 const FILES = "abcdefgh";
 const RANKS = "12345678";
 function directions(color) {
-    if (color === WHITE) {
+    if (color === Color.White) {
         return 1;
     }
     return -1;
 }
 function pawn_rank(color) {
-    if (color === WHITE) {
+    if (color === Color.White) {
         return 1;
     }
     return 6;
 }
 function opponent(color) {
-    if (color === WHITE) {
-        return BLACK;
+    if (color === Color.White) {
+        return Color.Black;
     }
-    return WHITE;
+    return Color.White;
 }
 function value(piece) {
     let value = VALUE.get(piece);
@@ -60,7 +65,7 @@ class Piece {
         return other.color == this.color && other.piece == this.piece;
     }
     toString() {
-        return this.color + this.piece;
+        return this.color.toString() + this.piece.toString();
     }
     can_move(coordinate_from, coordinate_to, board) {
         return true;
@@ -88,7 +93,7 @@ function is_horizontal_or_vertical(start, end) {
 }
 class King extends Piece {
     constructor(color) {
-        super(color, KING);
+        super(color, Pieces.King);
     }
     can_move(coordinate_from, coordinate_to, board) {
         let rank_delta = Math.abs(coordinate_from.rank - coordinate_to.rank);
@@ -100,7 +105,7 @@ class King extends Piece {
 }
 class Pawn extends Piece {
     constructor(color) {
-        super(color, PAWN);
+        super(color, Pieces.Pawn);
     }
     can_move(coordinate_from, coordinate_to, board) {
         let rank_delta = coordinate_to.rank - coordinate_from.rank;
@@ -126,7 +131,7 @@ class Pawn extends Piece {
 }
 class Rook extends Piece {
     constructor(color) {
-        super(color, ROOK);
+        super(color, Pieces.Rook);
     }
     can_move(coordinate_from, coordinate_to, board) {
         return is_horizontal_or_vertical(coordinate_from, coordinate_to) &&
@@ -135,7 +140,7 @@ class Rook extends Piece {
 }
 class Knight extends Piece {
     constructor(color) {
-        super(color, KNIGHT);
+        super(color, Pieces.Knight);
     }
     can_move(coordinate_from, coordinate_to, board) {
         let rank_delta = Math.abs(coordinate_from.rank - coordinate_to.rank);
@@ -145,7 +150,7 @@ class Knight extends Piece {
 }
 class Bishop extends Piece {
     constructor(color) {
-        super(color, BISHOP);
+        super(color, Pieces.Bishop);
     }
     can_move(coordinate_from, coordinate_to, board) {
         return is_diagonal(coordinate_from, coordinate_to) &&
@@ -154,7 +159,7 @@ class Bishop extends Piece {
 }
 class Queen extends Piece {
     constructor(color) {
-        super(color, QUEEN);
+        super(color, Pieces.Queen);
     }
     can_move(coordinate_from, coordinate_to, board) {
         return (is_horizontal_or_vertical(coordinate_from, coordinate_to) ||
@@ -246,28 +251,28 @@ class Board {
     initialize() {
         let rank = 1;
         for (let file = 0; file < 8; file++) {
-            this.put_piece(new Coordinate(rank, file), new Pawn(WHITE));
+            this.put_piece(new Coordinate(rank, file), new Pawn(Color.White));
         }
-        this.put_piece(new Coordinate(0, 0), new Rook(WHITE));
-        this.put_piece(new Coordinate(0, 7), new Rook(WHITE));
-        this.put_piece(new Coordinate(0, 1), new Knight(WHITE));
-        this.put_piece(new Coordinate(0, 6), new Knight(WHITE));
-        this.put_piece(new Coordinate(0, 2), new Bishop(WHITE));
-        this.put_piece(new Coordinate(0, 5), new Bishop(WHITE));
-        this.put_piece(new Coordinate(0, 3), new Queen(WHITE));
-        this.put_piece(new Coordinate(0, 4), new King(WHITE));
+        this.put_piece(new Coordinate(0, 0), new Rook(Color.White));
+        this.put_piece(new Coordinate(0, 7), new Rook(Color.White));
+        this.put_piece(new Coordinate(0, 1), new Knight(Color.White));
+        this.put_piece(new Coordinate(0, 6), new Knight(Color.White));
+        this.put_piece(new Coordinate(0, 2), new Bishop(Color.White));
+        this.put_piece(new Coordinate(0, 5), new Bishop(Color.White));
+        this.put_piece(new Coordinate(0, 3), new Queen(Color.White));
+        this.put_piece(new Coordinate(0, 4), new King(Color.White));
         rank = 6;
         for (let file = 0; file < 8; file++) {
-            this.put_piece(new Coordinate(rank, file), new Pawn(BLACK));
+            this.put_piece(new Coordinate(rank, file), new Pawn(Color.Black));
         }
-        this.put_piece(new Coordinate(7, 0), new Rook(BLACK));
-        this.put_piece(new Coordinate(7, 7), new Rook(BLACK));
-        this.put_piece(new Coordinate(7, 1), new Knight(BLACK));
-        this.put_piece(new Coordinate(7, 6), new Knight(BLACK));
-        this.put_piece(new Coordinate(7, 2), new Bishop(BLACK));
-        this.put_piece(new Coordinate(7, 5), new Bishop(BLACK));
-        this.put_piece(new Coordinate(7, 3), new Queen(BLACK));
-        this.put_piece(new Coordinate(7, 4), new King(BLACK));
+        this.put_piece(new Coordinate(7, 0), new Rook(Color.Black));
+        this.put_piece(new Coordinate(7, 7), new Rook(Color.Black));
+        this.put_piece(new Coordinate(7, 1), new Knight(Color.Black));
+        this.put_piece(new Coordinate(7, 6), new Knight(Color.Black));
+        this.put_piece(new Coordinate(7, 2), new Bishop(Color.Black));
+        this.put_piece(new Coordinate(7, 5), new Bishop(Color.Black));
+        this.put_piece(new Coordinate(7, 3), new Queen(Color.Black));
+        this.put_piece(new Coordinate(7, 4), new King(Color.Black));
     }
     all_empty(start, end) {
         let coordinates = get_coordinates(start, end);
@@ -310,7 +315,7 @@ class Board {
         new_board.initPieces(this.pieces);
         let piece = new_board.pieces[coordinate_from.rank][coordinate_from.file];
         let piece_to_replace = new_board.pieces[coordinate_to.rank][coordinate_to.file];
-        if (piece != undefined && piece.piece == PAWN && coordinate_to.rank == PAWN_PROMOTE_RANK.get(piece.color)) {
+        if (piece != undefined && piece.piece == Pieces.Pawn && coordinate_to.rank == PAWN_PROMOTE_RANK.get(piece.color)) {
             piece_to_replace = new Queen(piece.color);
         }
         if (piece_to_replace !== undefined) {
@@ -351,7 +356,7 @@ class Board {
     }
     not_matches_king(coordinate) {
         let piece = this.get_piece_at(coordinate);
-        return (piece != undefined && piece.piece != KING);
+        return (piece != undefined && piece.piece != Pieces.King);
     }
     remove_king(others_coordinates) {
         return others_coordinates.filter(coordinate => this.not_matches_king(coordinate));
@@ -384,8 +389,8 @@ class Move {
         this.coordinate_from = coordinate_from;
         this.board_before = board_before;
         this.board_after = board_before.move(coordinate_from, coordinate_to);
-        this.in_check = new Map([[BLACK, this.board_after.king_in_check(BLACK)],
-            [WHITE, this.board_after.king_in_check(WHITE)]]);
+        this.in_check = new Map([[Color.Black, this.board_after.king_in_check(Color.Black)],
+            [Color.White, this.board_after.king_in_check(Color.White)]]);
         this.captured = this.board_before.get_piece_at(this.coordinate_to);
     }
     toString() {
@@ -396,7 +401,7 @@ class Move {
         let piece = this.board_before.get_piece_at(this.coordinate_from);
         let piece_str = "";
         if (piece != undefined) {
-            if (piece.piece == PAWN) {
+            if (piece.piece == Pieces.Pawn) {
                 piece_str = "";
             }
             else {
@@ -470,85 +475,4 @@ class Game {
         return move;
     }
 }
-module.exports = { King, Queen, Bishop, Knight, Pawn, Rook, Coordinate, Board, directions, WHITE, Game };
-// def play_game():
-// game = Game()
-// color = WHITE
-// moves = .set(]
-// for i in range(300):
-//     move = game.next_move(color)
-// if move is None:
-// break
-// moves.append(move)
-// color = OPPONENT.set(color]
-//     print(str(move))
-// print(str(game.board))
-// print("-------------------------------------")
-// return moves
-// # Simple pygame program
-// # Import and initialize the pygame library
-// def thingy():
-// moves = play_game()
-// pygame.init()
-// piece_size = 80
-//     # Set up the drawing window
-// screen = pygame.display.set_mode(.set(piece_size * 8, piece_size * 8])
-// pygame.font.init()
-// font = pygame.font.Font('freesansbold.ttf', 32)
-// pieces = .set(KING, QUEEN, ROOK, KNIGHT, PAWN, QUEEN, BISHOP]
-//     blacks = {}
-// whites = {}
-// for piece in pieces:
-//     text = font.render(piece, True, pygame.Color(0, 0, 0), None)
-// blacks.set(piece] = text
-// text = font.render(piece, True, pygame.Color(255, 255, 255), None)
-// whites.set(piece] = text
-//     # Run until the user asks to quit
-// move_index = 0
-// running = True
-// while running:
-//         # Did the user click the window close button ?
-//         for event in pygame.event.get():
-//     if event.type == pygame.KEYDOWN:
-//         if event.key == pygame.K_LEFT:
-//             move_index = max(0, move_index - 1)
-// if event.key == pygame.K_RIGHT:
-//     move_index = min(len(moves) - 1, move_index + 1)
-// if event.type == pygame.QUIT:
-//     running = False
-//         # Fill the background with white
-//         screen.fill((180, 180, 180))
-//         # Draw a solid blue circle in the center
-// square = 0
-// board = moves.set(move_index].board_before
-// for rank in range(0, 8):
-//     for file in range(0, 8):
-//         color_square = None
-// coordinate = Coordinate(7 - rank, file)
-// piece = board.get_piece_at(coordinate)
-// if move_index != 0:
-//     if piece != moves.set(move_index - 1].board_before.get_piece_at(coordinate):
-//         color_square = pygame.Color(0, 127, 0)
-// if color_square is None and(square % 2 == 1):
-// color_square = pygame.Color(60, 60, 60)
-// if color_square is not None:
-// pygame.draw.rect(screen,
-//     color_square,
-//     pygame.Rect(file * piece_size, rank * piece_size, piece_size, piece_size))
-// if piece is not None:
-// rect = whites.set(piece.piece].get_rect()
-// width_offset = (piece_size - rect.width) / 2
-// height_offset = (piece_size - rect.height) / 2
-// location = (file * piece_size + width_offset, rank * piece_size + height_offset)
-// if piece.color == WHITE:
-//     screen.blit(whites.set(piece.piece], location)
-// else:
-//         screen.blit(blacks.set(piece.piece], location)
-// square = square + 1
-// square = square + 1
-//         # Flip the display
-// pygame.display.flip()
-//     # Done! Time to quit.
-//             pygame.quit()
-// if __name__ == '__main__':
-//     thingy()
+module.exports = { King, Queen, Bishop, Knight, Pawn, Rook, Coordinate, Board, directions, Color, Pieces, Game };

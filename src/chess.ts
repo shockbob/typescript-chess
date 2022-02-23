@@ -1,40 +1,47 @@
-const BLACK: string = "B"
-const WHITE: string = "W"
-const KING: string = "K"
-const QUEEN: string = "Q"
-const KNIGHT: string = "N"
-const ROOK: string = "R"
-const BISHOP: string = "B"
-const PAWN: string = "P"
-const PAWN_PROMOTE_RANK = new Map<string, number>([[WHITE, 7], [BLACK, 0]])
 
-const VALUE = new Map<string, number>([[QUEEN, 8], [BISHOP, 7], [KNIGHT, 6], [ROOK, 5], [PAWN, 4]]);
+
+enum Pieces {
+    King,
+    Queen,
+    Bishop,
+    Knight,
+    Rook,
+    Pawn,
+};
+const VALUE = new Map<Pieces, number>([[Pieces.Queen, 8], [Pieces.Bishop, 7],
+[Pieces.Knight, 6], [Pieces.Rook, 5], [Pieces.Pawn, 4]]);
+
+enum Color {
+    Black,
+    White,
+}
+const PAWN_PROMOTE_RANK = new Map<Color, number>([[Color.White, 7], [Color.Black, 0]])
 
 const FILES: string = "abcdefgh"
 const RANKS: string = "12345678"
 
-function directions(color: string): number {
-    if (color === WHITE) {
+function directions(color: Color): number {
+    if (color === Color.White) {
         return 1;
     }
     return -1;
 }
 
-function pawn_rank(color: string): number {
-    if (color === WHITE) {
+function pawn_rank(color: Color): number {
+    if (color === Color.White) {
         return 1;
     }
     return 6;
 }
 
-function opponent(color: string): string {
-    if (color === WHITE) {
-        return BLACK;
+function opponent(color: Color): Color {
+    if (color === Color.White) {
+        return Color.Black;
     }
-    return WHITE;
+    return Color.White;
 }
 
-function value(piece: string): number {
+function value(piece: Pieces): number {
     let value = VALUE.get(piece);
     if (value == undefined) {
         return 0;
@@ -60,9 +67,9 @@ Coordinate.prototype.toString = function coordToString() {
 };
 
 class Piece {
-    color: string;
-    piece: string;
-    constructor(color: string, piece: string) {
+    color: Color;
+    piece: Pieces;
+    constructor(color: Color, piece: Pieces) {
         this.color = color
         this.piece = piece
     }
@@ -71,7 +78,7 @@ class Piece {
     }
 
     toString(): string {
-        return this.color + this.piece
+        return this.color.toString() + this.piece.toString()
     }
 
     can_move(coordinate_from: Coordinate, coordinate_to: Coordinate, board: Board): boolean {
@@ -107,8 +114,8 @@ function is_horizontal_or_vertical(start: Coordinate, end: Coordinate): boolean 
 
 
 class King extends Piece {
-    constructor(color: string) {
-        super(color, KING)
+    constructor(color: Color) {
+        super(color, Pieces.King)
     }
 
     can_move(coordinate_from: Coordinate, coordinate_to: Coordinate, board: Board) {
@@ -122,8 +129,8 @@ class King extends Piece {
 
 
 class Pawn extends Piece {
-    constructor(color: string) {
-        super(color, PAWN)
+    constructor(color: Color) {
+        super(color, Pieces.Pawn)
     }
 
     can_move(coordinate_from: Coordinate, coordinate_to: Coordinate, board: Board): boolean {
@@ -151,8 +158,8 @@ class Pawn extends Piece {
 }
 
 class Rook extends Piece {
-    constructor(color: string) {
-        super(color, ROOK)
+    constructor(color: Color) {
+        super(color, Pieces.Rook)
     }
     can_move(coordinate_from: Coordinate, coordinate_to: Coordinate, board: Board): boolean {
         return is_horizontal_or_vertical(coordinate_from, coordinate_to) &&
@@ -162,8 +169,8 @@ class Rook extends Piece {
 
 
 class Knight extends Piece {
-    constructor(color: string) {
-        super(color, KNIGHT)
+    constructor(color: Color) {
+        super(color, Pieces.Knight)
     }
     can_move(coordinate_from: Coordinate, coordinate_to: Coordinate, board: Board): boolean {
         let rank_delta = Math.abs(coordinate_from.rank - coordinate_to.rank)
@@ -175,8 +182,8 @@ class Knight extends Piece {
 
 
 class Bishop extends Piece {
-    constructor(color: string) {
-        super(color, BISHOP)
+    constructor(color: Color) {
+        super(color, Pieces.Bishop)
     }
 
     can_move(coordinate_from: Coordinate, coordinate_to: Coordinate, board: Board): boolean {
@@ -187,8 +194,8 @@ class Bishop extends Piece {
 
 
 class Queen extends Piece {
-    constructor(color: string) {
-        super(color, QUEEN)
+    constructor(color: Color) {
+        super(color, Pieces.Queen)
     }
 
     can_move(coordinate_from: Coordinate, coordinate_to: Coordinate, board: Board): boolean {
@@ -269,7 +276,7 @@ class Board {
         return undefined
     }
 
-    king_in_check(color: string): boolean {
+    king_in_check(color: Color): boolean {
         let coordinate_king = this.find_piece(new King(color))
         if (coordinate_king != undefined) {
             for (let rank = 0; rank < 8; rank++) {
@@ -293,28 +300,28 @@ class Board {
     initialize() {
         let rank = 1
         for (let file = 0; file < 8; file++) {
-            this.put_piece(new Coordinate(rank, file), new Pawn(WHITE))
+            this.put_piece(new Coordinate(rank, file), new Pawn(Color.White))
         }
-        this.put_piece(new Coordinate(0, 0), new Rook(WHITE))
-        this.put_piece(new Coordinate(0, 7), new Rook(WHITE))
-        this.put_piece(new Coordinate(0, 1), new Knight(WHITE))
-        this.put_piece(new Coordinate(0, 6), new Knight(WHITE))
-        this.put_piece(new Coordinate(0, 2), new Bishop(WHITE))
-        this.put_piece(new Coordinate(0, 5), new Bishop(WHITE))
-        this.put_piece(new Coordinate(0, 3), new Queen(WHITE))
-        this.put_piece(new Coordinate(0, 4), new King(WHITE))
+        this.put_piece(new Coordinate(0, 0), new Rook(Color.White))
+        this.put_piece(new Coordinate(0, 7), new Rook(Color.White))
+        this.put_piece(new Coordinate(0, 1), new Knight(Color.White))
+        this.put_piece(new Coordinate(0, 6), new Knight(Color.White))
+        this.put_piece(new Coordinate(0, 2), new Bishop(Color.White))
+        this.put_piece(new Coordinate(0, 5), new Bishop(Color.White))
+        this.put_piece(new Coordinate(0, 3), new Queen(Color.White))
+        this.put_piece(new Coordinate(0, 4), new King(Color.White))
         rank = 6
         for (let file = 0; file < 8; file++) {
-            this.put_piece(new Coordinate(rank, file), new Pawn(BLACK))
+            this.put_piece(new Coordinate(rank, file), new Pawn(Color.Black))
         }
-        this.put_piece(new Coordinate(7, 0), new Rook(BLACK))
-        this.put_piece(new Coordinate(7, 7), new Rook(BLACK))
-        this.put_piece(new Coordinate(7, 1), new Knight(BLACK))
-        this.put_piece(new Coordinate(7, 6), new Knight(BLACK))
-        this.put_piece(new Coordinate(7, 2), new Bishop(BLACK))
-        this.put_piece(new Coordinate(7, 5), new Bishop(BLACK))
-        this.put_piece(new Coordinate(7, 3), new Queen(BLACK))
-        this.put_piece(new Coordinate(7, 4), new King(BLACK))
+        this.put_piece(new Coordinate(7, 0), new Rook(Color.Black))
+        this.put_piece(new Coordinate(7, 7), new Rook(Color.Black))
+        this.put_piece(new Coordinate(7, 1), new Knight(Color.Black))
+        this.put_piece(new Coordinate(7, 6), new Knight(Color.Black))
+        this.put_piece(new Coordinate(7, 2), new Bishop(Color.Black))
+        this.put_piece(new Coordinate(7, 5), new Bishop(Color.Black))
+        this.put_piece(new Coordinate(7, 3), new Queen(Color.Black))
+        this.put_piece(new Coordinate(7, 4), new King(Color.Black))
     }
 
     all_empty(start: Coordinate, end: Coordinate) {
@@ -331,7 +338,7 @@ class Board {
         return this.pieces[coordinate.rank][coordinate.file]
     }
 
-    get_not_empty(color: string): Coordinate[] {
+    get_not_empty(color: Color): Coordinate[] {
         let coordinates: Coordinate[] = []
         for (let rank = 0; rank < 8; rank++) {
             for (let file = 0; file < 8; file++) {
@@ -344,7 +351,7 @@ class Board {
         return coordinates
     }
 
-    get_empty(color: string): Coordinate[] {
+    get_empty(color: Color): Coordinate[] {
         let coordinates: Coordinate[] = []
         for (let rank = 0; rank < 8; rank++) {
             for (let file = 0; file < 8; file++) {
@@ -363,7 +370,7 @@ class Board {
         new_board.initPieces(this.pieces);
         let piece = new_board.pieces[coordinate_from.rank][coordinate_from.file];
         let piece_to_replace = new_board.pieces[coordinate_to.rank][coordinate_to.file];
-        if (piece != undefined && piece.piece == PAWN && coordinate_to.rank == PAWN_PROMOTE_RANK.get(piece.color)) {
+        if (piece != undefined && piece.piece == Pieces.Pawn && coordinate_to.rank == PAWN_PROMOTE_RANK.get(piece.color)) {
             piece_to_replace = new Queen(piece.color)
         }
         if (piece_to_replace !== undefined) {
@@ -373,7 +380,7 @@ class Board {
         return new_board
     }
 
-    get_moves(my_coordinates: Coordinate[], blank_coordinates: Coordinate[], color: string): Move[] {
+    get_moves(my_coordinates: Coordinate[], blank_coordinates: Coordinate[], color: Color): Move[] {
         let moves: Move[] = []
         for (let blank_coordinate of blank_coordinates) {
             for (let my_coordinate of my_coordinates) {
@@ -389,7 +396,7 @@ class Board {
         return moves
     }
 
-    get_captures(my_coordinates: Coordinate[], others_coordinates: Coordinate[], color: string): Move[] {
+    get_captures(my_coordinates: Coordinate[], others_coordinates: Coordinate[], color: Color): Move[] {
         let moves: Move[] = []
         for (let other_coordinate of others_coordinates) {
             for (let my_coordinate of my_coordinates) {
@@ -407,7 +414,7 @@ class Board {
 
     not_matches_king(coordinate: Coordinate): boolean {
         let piece = this.get_piece_at(coordinate);
-        return (piece != undefined && piece.piece != KING);
+        return (piece != undefined && piece.piece != Pieces.King);
     }
 
     remove_king(others_coordinates: Coordinate[]): Coordinate[] {
@@ -415,7 +422,7 @@ class Board {
     }
 
 
-    any_moves(color: string): boolean {
+    any_moves(color: Color): boolean {
         let opp = opponent(color)
         let others_coordinates = this.get_not_empty(opp)
         others_coordinates = this.remove_king(others_coordinates)
@@ -445,7 +452,7 @@ class Move {
     coordinate_from: Coordinate;
     board_before: Board;
     board_after: Board;
-    in_check: Map<String, boolean>;
+    in_check: Map<Color, boolean>;
     captured: Piece | undefined;
 
 
@@ -454,8 +461,8 @@ class Move {
         this.coordinate_from = coordinate_from
         this.board_before = board_before
         this.board_after = board_before.move(coordinate_from, coordinate_to)
-        this.in_check = new Map<String, boolean>([[BLACK, this.board_after.king_in_check(BLACK)],
-        [WHITE, this.board_after.king_in_check(WHITE)]]);
+        this.in_check = new Map<Color, boolean>([[Color.Black, this.board_after.king_in_check(Color.Black)],
+        [Color.White, this.board_after.king_in_check(Color.White)]]);
         this.captured = this.board_before.get_piece_at(this.coordinate_to)
     }
 
@@ -468,7 +475,7 @@ class Move {
         let piece = this.board_before.get_piece_at(this.coordinate_from)
         let piece_str = ""
         if (piece != undefined) {
-            if (piece.piece == PAWN) {
+            if (piece.piece == Pieces.Pawn) {
                 piece_str = ""
             } else {
                 piece_str = piece.toString()
@@ -479,7 +486,7 @@ class Move {
 }
 
 
-function get_check_moves(moves: Move[], color: string): Move[] {
+function get_check_moves(moves: Move[], color: Color): Move[] {
     let check_moves: Move[] = []
     let opp = opponent(color);
     for (let move of moves) {
@@ -493,7 +500,7 @@ function get_check_moves(moves: Move[], color: string): Move[] {
 
 
 
-function get_check_mate_moves(check_moves: Move[], color: string): Move[] {
+function get_check_mate_moves(check_moves: Move[], color: Color): Move[] {
     let check_mate_moves: Move[] = []
     for (let move of check_moves) {
         if (!move.board_after.any_moves(opponent(color))) {
@@ -524,7 +531,7 @@ class Game {
         this.board.initialize();
     }
 
-    next_move(color: string): Move | undefined {
+    next_move(color: Color): Move | undefined {
         let opponent_color = opponent(color)
         let others_coordinates = this.board.get_not_empty(opponent_color)
         others_coordinates = this.board.remove_king(others_coordinates)
@@ -556,5 +563,5 @@ class Game {
 }
 
 
-export = { King, Queen, Bishop, Knight, Pawn, Rook, Coordinate, Board, directions, WHITE, Game };
+export = { King, Queen, Bishop, Knight, Pawn, Rook, Coordinate, Board, directions, Color, Pieces, Game };
 
