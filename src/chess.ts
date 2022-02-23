@@ -42,7 +42,7 @@ function opponent(color: Color): Color {
 }
 
 function value(piece: Pieces): number {
-    let value = VALUE.get(piece);
+    const value = VALUE.get(piece);
     if (value == undefined) {
         return 0;
     }
@@ -100,15 +100,15 @@ function get_sign_diff(start: number, end: number): number {
 
 
 function is_diagonal(start: Coordinate, end: Coordinate): boolean {
-    let rank_delta = Math.abs(start.rank - end.rank)
-    let file_delta = Math.abs(start.file - end.file)
+    const rank_delta = Math.abs(start.rank - end.rank)
+    const file_delta = Math.abs(start.file - end.file)
     return rank_delta === file_delta && !(rank_delta === 0 && file_delta === 0)
 }
 
 
 function is_horizontal_or_vertical(start: Coordinate, end: Coordinate): boolean {
-    let rank_delta = start.rank - end.rank
-    let file_delta = start.file - end.file
+    const rank_delta = start.rank - end.rank
+    const file_delta = start.file - end.file
     return rank_delta == 0 || file_delta == 0 && !(rank_delta == 0 && file_delta == 0)
 }
 
@@ -119,8 +119,8 @@ class King extends Piece {
     }
 
     can_move(coordinate_from: Coordinate, coordinate_to: Coordinate, board: Board) {
-        let rank_delta: number = Math.abs(coordinate_from.rank - coordinate_to.rank)
-        let file_delta: number = Math.abs(coordinate_from.file - coordinate_to.file)
+        const rank_delta: number = Math.abs(coordinate_from.rank - coordinate_to.rank)
+        const file_delta: number = Math.abs(coordinate_from.file - coordinate_to.file)
         return (rank_delta == 1 && file_delta == 1) ||
             (rank_delta == 0 && file_delta == 1) ||
             (rank_delta == 1 && file_delta == 0)
@@ -134,12 +134,12 @@ class Pawn extends Piece {
     }
 
     can_move(coordinate_from: Coordinate, coordinate_to: Coordinate, board: Board): boolean {
-        let rank_delta = coordinate_to.rank - coordinate_from.rank
-        let file_delta = coordinate_to.file - coordinate_from.file
-        let direction: number = directions(this.color)
+        const rank_delta = coordinate_to.rank - coordinate_from.rank
+        const file_delta = coordinate_to.file - coordinate_from.file
+        const direction: number = directions(this.color)
         if (file_delta === 0) {
             if (pawn_rank(this.color) === coordinate_from.rank) {
-                let all_empty: boolean = board.all_empty(coordinate_from, coordinate_to)
+                const all_empty: boolean = board.all_empty(coordinate_from, coordinate_to)
                 return rank_delta == direction || (all_empty && rank_delta == 2 * direction)
             }
         } else {
@@ -150,9 +150,9 @@ class Pawn extends Piece {
     }
 
     can_attack(coordinate_from: Coordinate, coordinate_to: Coordinate, board: Board): boolean {
-        let rank_delta = coordinate_to.rank - coordinate_from.rank
-        let file_delta = Math.abs(coordinate_to.file - coordinate_from.file)
-        let direction = directions(this.color)
+        const rank_delta = coordinate_to.rank - coordinate_from.rank
+        const file_delta = Math.abs(coordinate_to.file - coordinate_from.file)
+        const direction = directions(this.color)
         return file_delta == 1 && rank_delta == direction
     }
 }
@@ -173,8 +173,8 @@ class Knight extends Piece {
         super(color, Pieces.Knight)
     }
     can_move(coordinate_from: Coordinate, coordinate_to: Coordinate, board: Board): boolean {
-        let rank_delta = Math.abs(coordinate_from.rank - coordinate_to.rank)
-        let file_delta = Math.abs(coordinate_from.file - coordinate_to.file)
+        const rank_delta = Math.abs(coordinate_from.rank - coordinate_to.rank)
+        const file_delta = Math.abs(coordinate_from.file - coordinate_to.file)
         return (rank_delta == 1 && file_delta == 2) || (rank_delta == 2 && file_delta == 1)
     }
 }
@@ -207,18 +207,18 @@ class Queen extends Piece {
 
 
 function get_coordinates(start: Coordinate, end: Coordinate): Coordinate[] {
-    let rank_start: number = start.rank
-    let rank_end = end.rank
-    let file_start = start.file
-    let file_end = end.file
-    let rank_sign = get_sign_diff(rank_start, rank_end)
-    let file_sign = get_sign_diff(file_start, file_end)
-    let rank_diff = Math.abs(rank_start - rank_end)
-    let file_diff = Math.abs(file_start - file_end)
-    let num_squares = Math.max(rank_diff, file_diff) - 1
+    const rank_start: number = start.rank
+    const rank_end = end.rank
+    const file_start = start.file
+    const file_end = end.file
+    const rank_sign = get_sign_diff(rank_start, rank_end)
+    const file_sign = get_sign_diff(file_start, file_end)
+    const rank_diff = Math.abs(rank_start - rank_end)
+    const file_diff = Math.abs(file_start - file_end)
+    const num_squares = Math.max(rank_diff, file_diff) - 1
     let rank = rank_start
     let file = file_start
-    let coordinates: Coordinate[] = []
+    const coordinates: Coordinate[] = []
     for (let square = 0; square < num_squares; square++) {
         rank = rank + rank_sign
         file = file + file_sign
@@ -277,11 +277,11 @@ class Board {
     }
 
     king_in_check(color: Color): boolean {
-        let coordinate_king = this.find_piece(new King(color))
+        const coordinate_king = this.find_piece(new King(color))
         if (coordinate_king != undefined) {
             for (let rank = 0; rank < 8; rank++) {
                 for (let file = 0; file < 8; file++) {
-                    let piece = this.pieces[rank][file]
+                    const piece = this.pieces[rank][file]
                     if (piece != undefined && piece.color !== color) {
                         if (piece.can_attack(new Coordinate(rank, file), coordinate_king, this)) {
                             return true;
@@ -325,8 +325,8 @@ class Board {
     }
 
     all_empty(start: Coordinate, end: Coordinate) {
-        let coordinates = get_coordinates(start, end)
-        for (let coordinate of coordinates) {
+        const coordinates = get_coordinates(start, end)
+        for (const coordinate of coordinates) {
             if (this.pieces[coordinate.rank][coordinate.file] != undefined) {
                 return false;
             }
@@ -339,10 +339,10 @@ class Board {
     }
 
     get_not_empty(color: Color): Coordinate[] {
-        let coordinates: Coordinate[] = []
+        const coordinates: Coordinate[] = []
         for (let rank = 0; rank < 8; rank++) {
             for (let file = 0; file < 8; file++) {
-                let piece = this.pieces[rank][file]
+                const piece = this.pieces[rank][file]
                 if (piece != undefined && piece.color === color) {
                     coordinates.push(new Coordinate(rank, file))
                 }
@@ -352,10 +352,10 @@ class Board {
     }
 
     get_empty(color: Color): Coordinate[] {
-        let coordinates: Coordinate[] = []
+        const coordinates: Coordinate[] = []
         for (let rank = 0; rank < 8; rank++) {
             for (let file = 0; file < 8; file++) {
-                let piece = this.pieces[rank][file]
+                const piece = this.pieces[rank][file]
                 if (piece == undefined) {
                     coordinates.push(new Coordinate(rank, file))
                 }
@@ -366,10 +366,10 @@ class Board {
 
 
     move(coordinate_from: Coordinate, coordinate_to: Coordinate): Board {
-        let new_board = new Board()
+        const new_board = new Board()
         new_board.initPieces(this.pieces);
-        let piece = new_board.pieces[coordinate_from.rank][coordinate_from.file];
-        let piece_to_replace = new_board.pieces[coordinate_to.rank][coordinate_to.file];
+        const piece = new_board.pieces[coordinate_from.rank][coordinate_from.file];
+        const piece_to_replace = new_board.pieces[coordinate_to.rank][coordinate_to.file];
         if (piece != undefined && piece.piece == Pieces.Pawn && coordinate_to.rank == PAWN_PROMOTE_RANK.get(piece.color)) {
             piece_to_replace = new Queen(piece.color)
         }
@@ -381,12 +381,12 @@ class Board {
     }
 
     get_moves(my_coordinates: Coordinate[], blank_coordinates: Coordinate[], color: Color): Move[] {
-        let moves: Move[] = []
-        for (let blank_coordinate of blank_coordinates) {
-            for (let my_coordinate of my_coordinates) {
-                let my_piece = this.get_piece_at(my_coordinate)
+        const moves: Move[] = []
+        for (const blank_coordinate of blank_coordinates) {
+            for (const my_coordinate of my_coordinates) {
+                const my_piece = this.get_piece_at(my_coordinate)
                 if (my_piece != undefined && my_piece.can_move(my_coordinate, blank_coordinate, this)) {
-                    let move = new Move(my_coordinate, blank_coordinate, this)
+                    const move = new Move(my_coordinate, blank_coordinate, this)
                     if (!move.in_check.get(color)) {
                         moves.push(move)
                     }
@@ -397,12 +397,12 @@ class Board {
     }
 
     get_captures(my_coordinates: Coordinate[], others_coordinates: Coordinate[], color: Color): Move[] {
-        let moves: Move[] = []
-        for (let other_coordinate of others_coordinates) {
-            for (let my_coordinate of my_coordinates) {
-                let my_piece = this.get_piece_at(my_coordinate)
+        const moves: Move[] = []
+        for (const other_coordinate of others_coordinates) {
+            for (const my_coordinate of my_coordinates) {
+                const my_piece = this.get_piece_at(my_coordinate)
                 if (my_piece != undefined && my_piece.can_attack(my_coordinate, other_coordinate, this)) {
-                    let move = new Move(my_coordinate, other_coordinate, this)
+                    const move = new Move(my_coordinate, other_coordinate, this)
                     if (!move.in_check.get(color)) {
                         moves.push(move)
                     }
@@ -413,7 +413,7 @@ class Board {
     }
 
     not_matches_king(coordinate: Coordinate): boolean {
-        let piece = this.get_piece_at(coordinate);
+        const piece = this.get_piece_at(coordinate);
         return (piece != undefined && piece.piece != Pieces.King);
     }
 
@@ -423,16 +423,16 @@ class Board {
 
 
     any_moves(color: Color): boolean {
-        let opp = opponent(color)
+        const opp = opponent(color)
         let others_coordinates = this.get_not_empty(opp)
         others_coordinates = this.remove_king(others_coordinates)
-        let empty_coordinates = this.get_empty(color)
-        let my_coordinates = this.get_not_empty(color)
-        let captures = this.get_captures(my_coordinates, others_coordinates, color)
+        const empty_coordinates = this.get_empty(color)
+        const my_coordinates = this.get_not_empty(color)
+        const captures = this.get_captures(my_coordinates, others_coordinates, color)
         if (captures.length > 0) {
             return true;
         }
-        let non_captures = this.get_moves(my_coordinates, empty_coordinates, color)
+        const non_captures = this.get_moves(my_coordinates, empty_coordinates, color)
         return non_captures.length > 0
     }
 }
@@ -472,7 +472,7 @@ class Move {
         if (this.captured != undefined) {
             capture = "x"
         }
-        let piece = this.board_before.get_piece_at(this.coordinate_from)
+        const piece = this.board_before.get_piece_at(this.coordinate_from)
         let piece_str = ""
         if (piece != undefined) {
             if (piece.piece == Pieces.Pawn) {
@@ -487,10 +487,10 @@ class Move {
 
 
 function get_check_moves(moves: Move[], color: Color): Move[] {
-    let check_moves: Move[] = []
-    let opp = opponent(color);
-    for (let move of moves) {
-        let in_check: boolean | undefined = move.in_check.get(opp);
+    const check_moves: Move[] = []
+    const opp = opponent(color);
+    for (const move of moves) {
+        const in_check: boolean | undefined = move.in_check.get(opp);
         if (in_check != undefined && in_check) {
             check_moves.push(move)
         }
@@ -501,8 +501,8 @@ function get_check_moves(moves: Move[], color: Color): Move[] {
 
 
 function get_check_mate_moves(check_moves: Move[], color: Color): Move[] {
-    let check_mate_moves: Move[] = []
-    for (let move of check_moves) {
+    const check_mate_moves: Move[] = []
+    for (const move of check_moves) {
         if (!move.board_after.any_moves(opponent(color))) {
             check_mate_moves.push(move)
         }
@@ -532,15 +532,15 @@ class Game {
     }
 
     next_move(color: Color): Move | undefined {
-        let opponent_color = opponent(color)
+        const opponent_color = opponent(color)
         let others_coordinates = this.board.get_not_empty(opponent_color)
         others_coordinates = this.board.remove_king(others_coordinates)
-        let empty_coordinates = this.board.get_empty(color)
-        let my_coordinates = this.board.get_not_empty(color)
-        let captures = this.board.get_captures(my_coordinates, others_coordinates, color)
-        let non_captures = this.board.get_moves(my_coordinates, empty_coordinates, color)
-        let check_moves = get_check_moves(captures.concat(non_captures), color)
-        let check_mate_moves = get_check_mate_moves(check_moves, color)
+        const empty_coordinates = this.board.get_empty(color)
+        const my_coordinates = this.board.get_not_empty(color)
+        const captures = this.board.get_captures(my_coordinates, others_coordinates, color)
+        const non_captures = this.board.get_moves(my_coordinates, empty_coordinates, color)
+        const check_moves = get_check_moves(captures.concat(non_captures), color)
+        const check_mate_moves = get_check_mate_moves(check_moves, color)
         let move: Move | undefined = undefined
         if (check_mate_moves.length > 0) {
             move = check_mate_moves[0]
